@@ -1,12 +1,11 @@
 #include "hzpch.h"
 #include "Application.h"
-
-
+#include "Input.h"
 #include "Hazel/Log.h"
 
-#include <glad/glad.h>
+#include "Hazel/Renderer/Renderer.h"
 
-#include "Input.h"
+#include <GLFW/glfw3.h>
 
 namespace Hazel {
 
@@ -59,11 +58,12 @@ namespace Hazel {
 	{
 		while (m_Running)
 		{
-			glClearColor(1, 0, 1, 1);
-			glClear(GL_COLOR_BUFFER_BIT);
+			float time = (float)glfwGetTime();  // Platform::GetTime()
+			Timestep timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
 
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timestep);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)
