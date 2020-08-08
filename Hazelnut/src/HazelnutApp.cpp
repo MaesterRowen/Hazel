@@ -5,17 +5,17 @@
 
 namespace Hazel
 {
-	class HazelnutApp : public Application
+	class Hazelnut : public Application
 	{
 	public:
-		HazelnutApp()
+		Hazelnut()
 			: Application("Hazelnut")
 		{
 			//PushLayer(new ExampleLayer());
 			PushLayer(new EditorLayer());
 		}
 
-		~HazelnutApp()
+		~Hazelnut()
 		{
 
 		}
@@ -23,6 +23,6 @@ namespace Hazel
 
 	Application* CreateApplication()
 	{
-		return new HazelnutApp();
+		return new Hazelnut();
 	}
 }
