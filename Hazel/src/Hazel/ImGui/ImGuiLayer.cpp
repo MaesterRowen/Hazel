@@ -23,6 +23,7 @@ namespace Hazel
 
 	void ImGuiLayer::OnAttach()
 	{
+		HZ_PROFILE_FUNCTION();
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -47,6 +48,7 @@ namespace Hazel
 	}
 	void ImGuiLayer::OnDetach()
 	{
+		HZ_PROFILE_FUNCTION();
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
@@ -54,12 +56,14 @@ namespace Hazel
 
 	void ImGuiLayer::Begin()
 	{
+		HZ_PROFILE_FUNCTION();
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 	}
 	void ImGuiLayer::End()
 	{
+		HZ_PROFILE_FUNCTION();
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
 		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
@@ -79,7 +83,6 @@ namespace Hazel
 
 	void ImGuiLayer::OnImGuiRender()
 	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
+
 	}
 }
