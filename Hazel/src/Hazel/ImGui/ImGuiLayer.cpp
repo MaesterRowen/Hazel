@@ -7,6 +7,8 @@
 
 #include "Hazel/Core/Application.h"
 
+#include <filesystem>
+
 // TEMPORARY
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -36,6 +38,7 @@ namespace Hazel {
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 		//ImGui::StyleColorsClassic();
+		//ImGui::StyleColorsLight();
 
 		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -44,6 +47,14 @@ namespace Hazel {
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
+
+		#if defined(HZ_ENABLE_HIGHDPI)
+		  style.ScaleAllSizes(2.0f);
+		  //io.FontGlobalScale = 1.0f;
+		  namespace fs = std::filesystem;
+		  const std::string fontPath = fs::current_path().generic_string() + "/assets/fonts/segoeui.ttf";
+		  io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 14.0f * 2, nullptr, nullptr);
+		#endif
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
