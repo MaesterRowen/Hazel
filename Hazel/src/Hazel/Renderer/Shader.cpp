@@ -1,7 +1,7 @@
 #include "hzpch.h"
-#include "Shader.h"
+#include "Hazel/Renderer/Shader.h"
 
-#include "Renderer.h"
+#include "Hazel/Renderer/Renderer.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Hazel {
@@ -10,11 +10,11 @@ namespace Hazel {
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:		HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr; nullptr;
-			case RendererAPI::API::OpenGL:		return std::make_shared<OpenGLShader>(filepath);
+			case RendererAPI::API::None:    HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
 		}
 
-		HZ_CORE_ASSERT(false, "Unknown rendererAPI!");
+		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -22,11 +22,11 @@ namespace Hazel {
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::None:		HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr; nullptr;
-			case RendererAPI::API::OpenGL:		return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPI::API::None:    HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+			case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 		}
 
-		HZ_CORE_ASSERT(false, "Unknown rendererAPI!");
+		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -35,6 +35,7 @@ namespace Hazel {
 		HZ_CORE_ASSERT(!Exists(name), "Shader already exists!");
 		m_Shaders[name] = shader;
 	}
+
 	void ShaderLibrary::Add(const Ref<Shader>& shader)
 	{
 		auto& name = shader->GetName();
@@ -47,12 +48,14 @@ namespace Hazel {
 		Add(shader);
 		return shader;
 	}
+
 	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
 	{
 		auto shader = Shader::Create(filepath);
 		Add(name, shader);
 		return shader;
 	}
+
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
 		HZ_CORE_ASSERT(Exists(name), "Shader not found!");
@@ -63,4 +66,5 @@ namespace Hazel {
 	{
 		return m_Shaders.find(name) != m_Shaders.end();
 	}
+
 }

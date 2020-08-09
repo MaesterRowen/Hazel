@@ -76,8 +76,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;HZ_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -98,8 +98,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;HZ_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -123,8 +123,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>hzpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;HZ_BUILD_DLL;GLFW_INCLUDE_NONE;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;HZ_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\GLFW\include;vendor\Glad\include;vendor\imgui;vendor\glm;vendor\stb_image;vendor\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -145,18 +145,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Hazel.h" />
+    <ClInclude Include="src\Hazel\Renderer\Camera.h" />
     <ClInclude Include="src\Hazel\Core\Application.h" />
-    <ClInclude Include="src\Hazel\Core\Core.h" />
+    <ClInclude Include="src\Hazel\Core\Base.h" />
     <ClInclude Include="src\Hazel\Core\EntryPoint.h" />
     <ClInclude Include="src\Hazel\Core\Input.h" />
     <ClInclude Include="src\Hazel\Core\KeyCodes.h" />
     <ClInclude Include="src\Hazel\Core\Layer.h" />
     <ClInclude Include="src\Hazel\Core\LayerStack.h" />
     <ClInclude Include="src\Hazel\Core\Log.h" />
-    <ClInclude Include="src\Hazel\Core\MouseButtonCodes.h" />
+    <ClInclude Include="src\Hazel\Core\MouseCodes.h" />
     <ClInclude Include="src\Hazel\Core\Timestep.h" />
     <ClInclude Include="src\Hazel\Core\Window.h" />
-    <ClInclude Include="src\Hazel\Debug\Instrumenter.h" />
+    <ClInclude Include="src\Hazel\Debug\Instrumentor.h" />
     <ClInclude Include="src\Hazel\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Hazel\Events\Event.h" />
     <ClInclude Include="src\Hazel\Events\KeyEvent.h" />
@@ -175,6 +176,10 @@
     <ClInclude Include="src\Hazel\Renderer\SubTexture2D.h" />
     <ClInclude Include="src\Hazel\Renderer\Texture.h" />
     <ClInclude Include="src\Hazel\Renderer\VertexArray.h" />
+    <ClInclude Include="src\Hazel\Scene\Components.h" />
+    <ClInclude Include="src\Hazel\Scene\Entity.h" />
+    <ClInclude Include="src\Hazel\Scene\Scene.h" />
+    <ClInclude Include="src\Hazel\Scene\SceneCamera.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLFrameBuffer.h" />
@@ -599,10 +604,12 @@
     <ClCompile Include="src\Hazel\Core\Layer.cpp" />
     <ClCompile Include="src\Hazel\Core\LayerStack.cpp" />
     <ClCompile Include="src\Hazel\Core\Log.cpp" />
+    <ClCompile Include="src\Hazel\Core\Window.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Hazel\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Hazel\Renderer\FrameBuffer.cpp" />
+    <ClCompile Include="src\Hazel\Renderer\GraphicsContext.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCamera.cpp" />
     <ClCompile Include="src\Hazel\Renderer\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Hazel\Renderer\RenderCommand.cpp" />
@@ -613,6 +620,9 @@
     <ClCompile Include="src\Hazel\Renderer\SubTexture2D.cpp" />
     <ClCompile Include="src\Hazel\Renderer\Texture.cpp" />
     <ClCompile Include="src\Hazel\Renderer\VertexArray.cpp" />
+    <ClCompile Include="src\Hazel\Scene\Entity.cpp" />
+    <ClCompile Include="src\Hazel\Scene\Scene.cpp" />
+    <ClCompile Include="src\Hazel\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLFrameBuffer.cpp" />

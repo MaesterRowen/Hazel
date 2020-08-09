@@ -1,18 +1,18 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "VertexArray.h"
+
+#include "Hazel/Renderer/VertexArray.h"
 
 namespace Hazel {
 
 	class RendererAPI
 	{
 	public:
-		enum class API {
-			None = 0,
-			OpenGL = 1,
+		enum class API
+		{
+			None = 0, OpenGL = 1
 		};
-
 	public:
 		virtual ~RendererAPI() = default;
 
@@ -23,8 +23,10 @@ namespace Hazel {
 
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
-		inline static API GetAPI() { return s_API; }
+		static API GetAPI() { return s_API; }
+		static Scope<RendererAPI> Create();
 	private:
 		static API s_API;
 	};
+
 }

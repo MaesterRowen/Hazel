@@ -1,5 +1,5 @@
 workspace "Hazel"
-	architecture "x64"
+	architecture "x86_64"
 	startproject "Hazelnut"
 
 	configurations
@@ -23,12 +23,13 @@ IncludeDir["Glad"] = "Hazel/vendor/Glad/include"
 IncludeDir["ImGui"] = "Hazel/vendor/imgui"
 IncludeDir["glm"] = "Hazel/vendor/glm"
 IncludeDir["stb_image"] = "Hazel/vendor/stb_image"
+IncludeDir["entt"] = "Hazel/vendor/entt/include"
+
 
 group "Dependencies"
 	include "Hazel/vendor/GLFW"
 	include "Hazel/vendor/Glad"
 	include "Hazel/vendor/imgui"
-
 group ""
 
 project "Hazel"
@@ -56,7 +57,8 @@ project "Hazel"
 
 	defines
 	{
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
 	}
 
 	includedirs
@@ -67,7 +69,8 @@ project "Hazel"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links 
@@ -83,8 +86,6 @@ project "Hazel"
 
 		defines
 		{
-			"HZ_BUILD_DLL",
-			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"
@@ -123,7 +124,8 @@ project "Sandbox"
 		"Hazel/vendor/spdlog/include",
 		"Hazel/src",
 		"Hazel/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
@@ -170,7 +172,8 @@ project "Hazelnut"
 		"Hazel/vendor/spdlog/include",
 		"Hazel/src",
 		"Hazel/vendor",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links
