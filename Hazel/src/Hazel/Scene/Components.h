@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 
 #include "SceneCamera.h"
+#include "Hazel/Renderer/SubTexture2D.h"
+#include "ScriptableEntity.h"
 
 namespace Hazel {
 
@@ -29,6 +31,7 @@ namespace Hazel {
 
     struct SpriteRendererComponent
     {
+        Ref<SubTexture2D> Sprite;
         glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 
         SpriteRendererComponent() = default;
@@ -46,6 +49,29 @@ namespace Hazel {
 
         CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
+    };
+
+    struct NativeScriptComponent
+    {
+        ScriptableEntity* Instance = nullptr;
+
+        std::function<void()> InstantiateFunction;
+        std::function<void()> DestroyInstanceFunction;
+
+        std::function<void(ScriptableEntity*)> OnCreateFunction;
+        std::function<void(ScriptableEntity*)> OnDesteroyFunction;
+        std::function<void(ScriptableEntity*, Timestep)> OnUpdateFunction;
+
+        template<typename T>
+        void Bind()
+        {
+            InstantiateFunction = [&]() { Instance = new T(); };
+            DestroyInstanceFunction = [&]() { delete (T*)Instance; Instance = nullptr; };
+
+            OnCreateFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnCreate(); };
+            OnDesteroyFunction = [](ScriptableEntity* instance) { ((T*)instance)->OnDestroy(); };
+            OnUpdateFunction = [](ScriptableEntity* instance, Timestep ts) { ((T*)instance)->OnUpdate(ts); };
+        }
     };
 
 }

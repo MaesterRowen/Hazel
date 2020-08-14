@@ -3,6 +3,12 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/geometric.hpp>
+#include <glm/gtx/euler_angles.hpp>
+#include <glm\glm\gtx\quaternion.hpp>
+
+// Include Scripts
+#include "NativeScripts/CameraController.h"
 
 namespace Hazel {
 
@@ -16,6 +22,9 @@ namespace Hazel {
 		HZ_PROFILE_FUNCTION();
 
 		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
+		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+
+		m_GrassSprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128.0f, 128.0f });
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Width = 1280;
@@ -26,11 +35,15 @@ namespace Hazel {
 
 		// Entity
 		m_SquareEntity = m_ActiveScene->CreateEntity("Green square");
-		m_SquareEntity.AddComponent<SpriteRendererComponent>( glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
+		auto& sr = m_SquareEntity.AddComponent<SpriteRendererComponent>( glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+		sr.Sprite = m_GrassSprite;
+
 
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Main Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
 
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
@@ -153,8 +166,58 @@ namespace Hazel {
 		{
 			ImGui::Text("%s", m_SquareEntity.GetComponent<TagComponent>().Tag.c_str());
 
-			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
-			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+			auto& sr = m_SquareEntity.GetComponent<SpriteRendererComponent>();
+			auto& tr = m_SquareEntity.GetComponent<TransformComponent>();
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(sr.Color));
+			
+
+			bool transformChanged = false;
+
+			// Extracte the translation
+			if (ImGui::DragFloat3("Position", glm::value_ptr(tr.Transform[3])))
+				transformChanged = true;
+
+			// Extract the scale
+			glm::vec3 scale = { glm::length(tr.Transform[0]), glm::length(tr.Transform[1]), glm::length(tr.Transform[2]) };
+			if (ImGui::DragFloat3("Scale", glm::value_ptr(scale)))
+				transformChanged = true;
+
+			// Extract the rotation
+			glm::mat4 temp = tr.Transform;
+			temp[3] = { 0.0f, 0.0f, 0.0f, 1.0f };
+			
+			// Create rotation matrix
+			temp[0].x /= scale.x;		temp[0].y /= scale.x;		temp[0].z /= scale.x;
+			temp[1].x /= scale.y;		temp[1].y /= scale.y;		temp[1].z /= scale.y;
+			temp[2].x /= scale.z;		temp[2].y /= scale.z;		temp[2].z /= scale.z;
+
+			glm::quat quatRotation = glm::quat_cast(temp);
+			glm::vec3 eulerAngles = glm::eulerAngles(quatRotation) *180.0f / glm::pi<float>();
+
+			glm::mat4 rotMtx = glm::mat4(1.0f);
+			if (ImGui::InputFloat3("Rotation", glm::value_ptr(eulerAngles))) {
+				//HZ_CORE_INFO("Temp[0].x: {0}", temp[0].x);
+				glm::quat t = glm::quat(glm::vec3(eulerAngles.x, eulerAngles.y, eulerAngles.z));
+				HZ_CORE_INFO("Angles: {0}, {1}, {2}", eulerAngles.x, eulerAngles.y, eulerAngles.z);
+			
+				//glm::quat newRotation = glm::toQuat(glm::orientate4(eulerAngles));
+				rotMtx = glm::mat4_cast(t);
+				transformChanged = true;
+			}
+
+			if (transformChanged) {
+
+				tr.Transform = glm::translate(glm::mat4(1.0f), { tr.Transform[3].x, tr.Transform[3].y, tr.Transform[3].z }) *
+					rotMtx * 
+					glm::scale(glm::mat4(1.0f), { scale.x, scale.y, scale.z });
+			}
+
+
+			ImGui::InputFloat4("Row 1", glm::value_ptr(tr.Transform[0]));
+			ImGui::InputFloat4("Row 2", glm::value_ptr(tr.Transform[1]));
+			ImGui::InputFloat4("Row 3", glm::value_ptr(tr.Transform[2]));
+			ImGui::InputFloat4("Row 4", glm::value_ptr(tr.Transform[3]));
+
 			ImGui::Separator();
 		}
 
