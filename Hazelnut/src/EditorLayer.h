@@ -2,6 +2,8 @@
 
 #include "Hazel.h"
 
+#include "Panels/SceneHierarchyPanel.h"
+
 namespace Hazel {
 
 	class EditorLayer : public Layer
@@ -24,11 +26,11 @@ namespace Hazel {
 		Ref<Shader> m_FlatColorShader;
 		Ref<Framebuffer> m_Framebuffer;
 		Ref<Texture2D> m_SpriteSheet;
-		Ref<SubTexture2D> m_GrassSprite;
+		Ref<SubTexture2D> m_GrassSprite, m_WaterSprite;
 		Ref<Texture2D> m_CheckerboardTexture;
 		Ref<Scene> m_ActiveScene;
 
-		Entity m_SquareEntity;
+		Entity m_SquareEntity, m_GrassEntity;
 		Entity m_CameraEntity;
 		Entity m_SecondCamera;
 		bool m_PrimaryCamera = true;
@@ -37,6 +39,9 @@ namespace Hazel {
 		
 
 		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
+
+		// Panels
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 
 }

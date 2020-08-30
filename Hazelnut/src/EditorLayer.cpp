@@ -24,7 +24,8 @@ namespace Hazel {
 		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
 		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 
-		m_GrassSprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128.0f, 128.0f });
+		m_WaterSprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128.0f, 128.0f });
+		m_GrassSprite = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 1, 11 }, { 128.0f, 128.0f });
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Width = 1280;
@@ -34,10 +35,15 @@ namespace Hazel {
 		m_ActiveScene = CreateRef<Scene>();
 
 		// Entity
-		m_SquareEntity = m_ActiveScene->CreateEntity("Green square");
+		m_SquareEntity = m_ActiveScene->CreateEntity("Water Sprite");
 		auto& sr = m_SquareEntity.AddComponent<SpriteRendererComponent>( glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
-		sr.Sprite = m_GrassSprite;
+		sr.Sprite = m_WaterSprite;
+		
 
+		// Create a new eneity
+		m_GrassEntity = m_ActiveScene->CreateEntity("Grass Sprite");
+		auto& sr2 = m_GrassEntity.AddComponent<SpriteRendererComponent>(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
+		sr2.Sprite = m_GrassSprite;
 
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Main Camera");
@@ -48,6 +54,9 @@ namespace Hazel {
 		m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
 		auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
+
+		// Panels
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -151,6 +160,8 @@ namespace Hazel {
 			ImGui::EndMenuBar();
 		}
 
+		m_SceneHierarchyPanel.OnImGuiRender();
+
 		ImGui::Begin("Settings");
 
 		auto stats = Renderer2D::GetStats();
@@ -183,40 +194,27 @@ namespace Hazel {
 				transformChanged = true;
 
 			// Extract the rotation
-			glm::mat4 temp = tr.Transform;
-			temp[3] = { 0.0f, 0.0f, 0.0f, 1.0f };
-			
-			// Create rotation matrix
-			temp[0].x /= scale.x;		temp[0].y /= scale.x;		temp[0].z /= scale.x;
-			temp[1].x /= scale.y;		temp[1].y /= scale.y;		temp[1].z /= scale.y;
-			temp[2].x /= scale.z;		temp[2].y /= scale.z;		temp[2].z /= scale.z;
+			glm::vec3 rotation;
+			glm::extractEulerAngleYXZ(tr.Transform, rotation.y, rotation.x, rotation.z);
 
-			glm::quat quatRotation = glm::quat_cast(temp);
-			glm::vec3 eulerAngles = glm::eulerAngles(quatRotation) *180.0f / glm::pi<float>();
+			rotation = glm::degrees(rotation);
 
-			glm::mat4 rotMtx = glm::mat4(1.0f);
-			if (ImGui::InputFloat3("Rotation", glm::value_ptr(eulerAngles))) {
-				//HZ_CORE_INFO("Temp[0].x: {0}", temp[0].x);
-				glm::quat t = glm::quat(glm::vec3(eulerAngles.x, eulerAngles.y, eulerAngles.z));
-				HZ_CORE_INFO("Angles: {0}, {1}, {2}", eulerAngles.x, eulerAngles.y, eulerAngles.z);
-			
-				//glm::quat newRotation = glm::toQuat(glm::orientate4(eulerAngles));
-				rotMtx = glm::mat4_cast(t);
+
+			if (ImGui::DragFloat3("Rotation", glm::value_ptr(rotation))) {
 				transformChanged = true;
 			}
 
 			if (transformChanged) {
 
-				tr.Transform = glm::translate(glm::mat4(1.0f), { tr.Transform[3].x, tr.Transform[3].y, tr.Transform[3].z }) *
+				// Calculate rotation matrix
+				glm::vec3 radRotation = glm::radians(rotation);
+				glm::mat4 rotMtx = glm::eulerAngleYXZ(radRotation.y, radRotation.x, radRotation.z);
+				//glm::mat4 rotMtx = glm::mat4(1.0f);
+
+				tr.Transform = glm::translate(glm::mat4(1.0f), { tr.Transform[3].x, tr.Transform[3].y, tr.Transform[3].z }) *	
 					rotMtx * 
 					glm::scale(glm::mat4(1.0f), { scale.x, scale.y, scale.z });
 			}
-
-
-			ImGui::InputFloat4("Row 1", glm::value_ptr(tr.Transform[0]));
-			ImGui::InputFloat4("Row 2", glm::value_ptr(tr.Transform[1]));
-			ImGui::InputFloat4("Row 3", glm::value_ptr(tr.Transform[2]));
-			ImGui::InputFloat4("Row 4", glm::value_ptr(tr.Transform[3]));
 
 			ImGui::Separator();
 		}
